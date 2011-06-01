@@ -71,7 +71,8 @@ class Redis
         klass.send :include, Redis::Objects::Values
         klass.send :include, Redis::Objects::Hashes
 
-        after_destroy :delete_redis_objects if respond_to? :after_destroy
+        # Clean up redis objects after destroy for AR
+        klass.after_destroy :delete_redis_objects if klass.respond_to? :after_destroy
       end
     end
 
