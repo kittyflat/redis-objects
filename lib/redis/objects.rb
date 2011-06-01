@@ -70,6 +70,8 @@ class Redis
         klass.send :include, Redis::Objects::SortedSets
         klass.send :include, Redis::Objects::Values
         klass.send :include, Redis::Objects::Hashes
+
+        after_destroy :delete_redis_objects if respond_to? :after_destroy
       end
     end
 
@@ -133,6 +135,12 @@ class Redis
           "#{klass.redis_prefix}:#{id}:#{name}"
         end
       end
+
+      def delete_redis_objects
+        puts "deleting redis objects for #{self.class}:#{self.id} keys:#{self.class.redis_objects.keys.inspect}"
+        self.class.redis_objects.keys.each { |name| self.send(name).delete }
+      end
+
     end
   end
 end
